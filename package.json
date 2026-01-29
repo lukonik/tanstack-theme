@@ -33,6 +33,7 @@
     "test": "vitest",
     "typecheck": "tsc --noEmit",
     "release": "bunx @changesets/cli publish",
+    "changeset": "bunx @changesets/cli",
     "version": "bunx @changesets/cli version",
     "prepublishOnly": "bun run build"
   },
