@@ -36,10 +36,13 @@
     "prepublishOnly": "pnpm run build"
   },
   "peerDependencies": {
+    "@tanstack/react-router": "^1.157.16",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
+    "@tanstack/react-router-devtools": "^1.157.16",
+    "@tanstack/router-plugin": "^1.157.16",
     "@tsconfig/strictest": "^2.0.8",
     "@types/node": "^25.0.3",
     "@types/react": "^19.2.7",
