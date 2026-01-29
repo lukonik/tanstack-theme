@@ -1,5 +1,4 @@
 <div align="center">
-  <img src="logo.png" alt="TanStack Theme Logo" width="200" />
   <h1>TanStack Themer</h1>
   <p>A powerful, SSR-friendly theme management library for React applications built with TanStack Router and TanStack Start</p>
 </div>
