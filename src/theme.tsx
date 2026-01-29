@@ -43,7 +43,7 @@ const Theme = ({
   storageKey = "theme",
   themes = defaultThemes,
   defaultTheme = enableSystem ? "system" : "light",
-  attribute = "data-theme",
+  attribute = "class",
   value,
   children,
   nonce,

@@ -13,7 +13,6 @@ function RootComponent() {
       <ThemeProvider
         themes={["light", "dark", "ocean", "forest", "sunset"]}
         defaultTheme="system"
-        attribute="data-theme"
         enableSystem
         enableColorScheme
       >

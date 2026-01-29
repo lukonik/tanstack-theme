@@ -1,29 +1,506 @@
-# tanstack-themer
+<div align="center">
+  <img src="logo.png" alt="TanStack Theme Logo" width="200" />
+  <h1>TanStack Themer</h1>
+  <p>A powerful, SSR-friendly theme management library for React applications built with TanStack Router and TanStack Start</p>
+</div>
 
-A starter for creating a React component library.
+<div align="center">
+
+[![NPM Version](https://img.shields.io/npm/v/tanstack-themer)](https://www.npmjs.com/package/tanstack-themer)
+[![License](https://img.shields.io/npm/l/tanstack-themer)](https://github.com/lukonik/tanstack-themer)
+
+</div>
+
+## Features
+
+✓ **Zero Flash of Unstyled Content (FOUC)** - Theme applied before React hydration
+
+✓ **SSR Support** - Works seamlessly with server-side rendering
+
+✓ **Client Support** - Works seamlessly with SPA (Single Page Applications)
+
+✓ **System Theme Detection** - Automatically follows OS dark/light mode preferences
+
+✓ **Different Storage Types** - Save theme with built-in localStorage, sessionStorage, cookieStorage, or write your own custom storage adapter
+
+✓ **Cross-Tab Synchronization** - Theme changes sync across browser tabs
+
+✓ **Flexible Theme Application** - Apply themes via data attributes or CSS classes
+
+✓ **Custom Theme Values** - Map theme names to custom attribute values
+
+✓ **TypeScript Support** - Fully typed API
+
+✓ **Lightweight** - Minimal bundle size with no external dependencies (except peer deps)
+
+✓ **No Transition Flash** - Optionally disable CSS transitions during theme changes
+
+## Installation
+
+```bash
+npm install tanstack-themer
+# or
+yarn add tanstack-themer
+# or
+pnpm add tanstack-themer
+# or
+bun add tanstack-themer
+```
+
+## Quick Start
+
+### Basic Setup
+
+Wrap your app with `ThemeProvider` in your root route:
+
+```tsx
+import { ThemeProvider } from 'tanstack-themer'
+import { createRootRoute, Outlet } from '@tanstack/react-router'
+
+export const Route = createRootRoute({
+  component: () => (
+    <ThemeProvider>
+      <Outlet />
+    </ThemeProvider>
+  ),
+})
+```
+
+### Using the Theme
+
+Use the `useTheme` hook to access and control the theme:
+
+```tsx
+import { useTheme } from 'tanstack-themer'
+
+function ThemeSwitcher() {
+  const { theme, setTheme } = useTheme()
+
+  return (
+    <div>
+      <p>Current theme: {theme}</p>
+      <button onClick={() => setTheme('light')}>Light</button>
+      <button onClick={() => setTheme('dark')}>Dark</button>
+      <button onClick={() => setTheme('system')}>System</button>
+    </div>
+  )
+}
+```
+
+### Styling with Themes
+
+By default, themes are applied via the `class` attribute on the `<html>` element:
+
+```css
+/* CSS */
+.light {
+  --background: white;
+  --text: black;
+}
+
+.dark {
+  --background: black;
+  --text: white;
+}
+```
+
+Or with Tailwind CSS using class variants:
+
+```tsx
+<div className="bg-white dark:bg-black">
+  Content
+</div>
+```
+
+## API Reference
+
+### ThemeProvider Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `themes` | `string[]` | `['light', 'dark']` | List of available theme names |
+| `defaultTheme` | `string` | `'system'` (if `enableSystem` is true) or `'light'` | Default theme to use |
+| `enableSystem` | `boolean` | `true` | Enable system theme detection |
+| `enableColorScheme` | `boolean` | `true` | Apply `color-scheme` to html element |
+| `storageKey` | `string` | `'theme'` | Key used to store theme in storage |
+| `storage` | `'localStorage'` \| `'sessionStorage'` \| `'cookie'` \| `ThemeStorage` | `'localStorage'` | Storage mechanism to persist theme |
+| `attribute` | `'class'` \| `'data-*'` \| `Array` | `'class'` | HTML attribute to apply theme (e.g., `'class'`, `'data-theme'`, `['class', 'data-mode']`) |
+| `value` | `object` | `undefined` | Mapping of theme names to attribute values |
+| `forcedTheme` | `string` | `undefined` | Force a specific theme (ignores user preference) |
+| `disableTransitionOnChange` | `boolean` | `false` | Disable CSS transitions when changing themes |
+| `nonce` | `string` | `undefined` | Nonce for CSP headers |
+
+### useTheme Hook
+
+Returns an object with the following properties:
+
+```tsx
+const {
+  theme,          // Current theme name (e.g., 'light', 'dark', 'system')
+  setTheme,       // Function to change theme
+  resolvedTheme,  // Actual theme in use (resolves 'system' to 'light' or 'dark')
+  systemTheme,    // System preference ('light' or 'dark')
+  themes,         // Array of available themes
+  forcedTheme,    // Forced theme if set
+} = useTheme()
+```
+
+#### setTheme
+
+```tsx
+// Direct value
+setTheme('dark')
+
+// Function form (for toggling)
+setTheme(prev => prev === 'dark' ? 'light' : 'dark')
+```
+
+## Advanced Usage
+
+### Custom Themes
+
+Define your own theme names:
+
+```tsx
+<ThemeProvider
+  themes={['light', 'dark', 'ocean', 'forest', 'sunset']}
+  defaultTheme="ocean"
+>
+  <App />
+</ThemeProvider>
+```
+
+```css
+.ocean {
+  --bg-primary: #001f3f;
+  --text-primary: #7fdbff;
+}
+
+.forest {
+  --bg-primary: #1a3d2e;
+  --text-primary: #90ee90;
+}
+
+.sunset {
+  --bg-primary: #ff6b35;
+  --text-primary: #ffe66d;
+}
+```
+
+### Data Attribute
+
+Apply themes via data attributes instead of CSS classes:
+
+```tsx
+<ThemeProvider attribute="data-theme">
+  <App />
+</ThemeProvider>
+```
+
+```css
+[data-theme='light'] { /* styles */ }
+[data-theme='dark'] { /* styles */ }
+```
+
+### Multiple Attributes
+
+Apply themes to multiple attributes simultaneously:
+
+```tsx
+<ThemeProvider attribute={['class', 'data-mode']}>
+  <App />
+</ThemeProvider>
+```
+
+This will apply both `class="dark"` and `data-mode="dark"` to the html element.
+
+### Custom Value Mapping
+
+Map theme names to different attribute values:
+
+```tsx
+<ThemeProvider
+  themes={['light', 'dark']}
+  value={{
+    light: 'day',
+    dark: 'night',
+  }}
+>
+  <App />
+</ThemeProvider>
+```
+
+This will apply `class="day"` for light and `class="night"` for dark.
+
+### Storage Options
+
+#### localStorage (default)
+
+Persists across browser sessions:
+
+```tsx
+<ThemeProvider storage="localStorage" storageKey="app-theme">
+  <App />
+</ThemeProvider>
+```
+
+#### sessionStorage
+
+Persists only for the current session:
+
+```tsx
+<ThemeProvider storage="sessionStorage">
+  <App />
+</ThemeProvider>
+```
+
+#### Cookie Storage
+
+Useful for SSR scenarios where you need access to theme on the server:
+
+```tsx
+<ThemeProvider storage="cookie" storageKey="theme">
+  <App />
+</ThemeProvider>
+```
+
+#### Custom Storage Adapter
+
+Implement your own storage solution:
+
+```tsx
+import { ThemeStorage } from 'tanstack-themer'
+
+const myStorage: ThemeStorage = {
+  getItem: (key) => {
+    // Your custom get logic
+    return customStore.get(key)
+  },
+  setItem: (key, value) => {
+    // Your custom set logic
+    customStore.set(key, value)
+  },
+  removeItem: (key) => {
+    // Optional: custom remove logic
+    customStore.remove(key)
+  },
+  subscribe: (key, callback) => {
+    // Optional: for cross-tab sync
+    const handler = (newValue) => callback(newValue)
+    customStore.on('change', handler)
+    return () => customStore.off('change', handler)
+  }
+}
+
+<ThemeProvider storage={myStorage}>
+  <App />
+</ThemeProvider>
+```
+
+### Forced Theme
+
+Force a specific theme for a page or component (useful for landing pages or specific routes):
+
+```tsx
+<ThemeProvider forcedTheme="dark">
+  <App />
+</ThemeProvider>
+```
+
+When `forcedTheme` is set, user preferences are ignored.
+
+### Disable Transitions
+
+Prevent CSS transition flash when changing themes:
+
+```tsx
+<ThemeProvider disableTransitionOnChange={true}>
+  <App />
+</ThemeProvider>
+```
+
+### CSP Support
+
+Add a nonce for Content Security Policy:
+
+```tsx
+<ThemeProvider nonce={nonce}>
+  <App />
+</ThemeProvider>
+```
+
+## SSR & FOUC Prevention
+
+TanStack Themer automatically prevents flash of unstyled content (FOUC) by injecting an inline script that runs before React hydration. The script reads the stored theme and applies it to the DOM immediately.
+
+The `ThemeScript` component (included in `ThemeProvider`) uses TanStack Router's `ScriptOnce` to inject the appropriate script based on your storage type:
+
+- `localStorageScript` - For localStorage
+- `sessionStorageScript` - For sessionStorage
+- `cookieStorageScript` - For cookie storage
+
+This ensures the correct theme is applied before the page renders, preventing any flash of the wrong theme.
+
+### How It Works
+
+1. User visits your site
+2. Inline script executes (before React hydration)
+3. Script reads theme from storage
+4. Script applies theme to `document.documentElement`
+5. React hydrates with correct theme already applied
+6. No flash of wrong theme!
+
+## Cross-Tab Synchronization
+
+Theme changes automatically sync across browser tabs. When you change the theme in one tab, all other tabs update immediately.
+
+This works through the storage adapter's `subscribe` method, which listens for storage events:
+
+```tsx
+// Automatically handled by the library
+useEffect(() => {
+  return storage.subscribe?.('theme', (newValue) => {
+    setTheme(newValue ?? defaultTheme)
+  })
+}, [])
+```
+
+## Examples
+
+### Simple Theme Toggle
+
+```tsx
+function ThemeToggle() {
+  const { theme, setTheme } = useTheme()
+
+  return (
+    <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
+      {theme === 'dark' ? '☀️' : '🌙'}
+    </button>
+  )
+}
+```
+
+### Theme Selector Dropdown
+
+```tsx
+function ThemeSelector() {
+  const { theme, themes, setTheme } = useTheme()
+
+  return (
+    <select value={theme} onChange={(e) => setTheme(e.target.value)}>
+      {themes.map((t) => (
+        <option key={t} value={t}>
+          {t.charAt(0).toUpperCase() + t.slice(1)}
+        </option>
+      ))}
+    </select>
+  )
+}
+```
+
+### Avoiding Hydration Mismatch
+
+To avoid hydration mismatches, wait for mount before rendering theme-dependent content:
+
+```tsx
+function ThemedComponent() {
+  const [mounted, setMounted] = useState(false)
+  const { theme } = useTheme()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return <div>Loading...</div>
+  }
+
+  return <div>Current theme: {theme}</div>
+}
+```
+
+### Per-Route Themes
+
+Use `forcedTheme` on specific routes:
+
+```tsx
+// Dark theme for landing page
+export const Route = createFileRoute('/landing')({
+  component: () => (
+    <ThemeProvider forcedTheme="dark">
+      <LandingPage />
+    </ThemeProvider>
+  ),
+})
+```
+
+Note: Nested `ThemeProvider` components automatically pass through to the parent, so you can safely use multiple providers.
+
+## TypeScript
+
+The library is written in TypeScript and exports all necessary types:
+
+```tsx
+import type {
+  ThemeProviderProps,
+  UseThemeProps,
+  ThemeStorage,
+  BuiltInStorage,
+  Attribute,
+} from 'tanstack-themer'
+```
 
 ## Development
 
-- Install dependencies:
-
 ```bash
-npm install
+# Install dependencies
+bun install
+
+# Build library
+bun run build
+
+# Watch mode
+bun run dev
+
+# Run playground
+bun run play
+
+# Run tests
+bun run test
+
+# Type checking
+bun run typecheck
 ```
 
-- Run the playground:
+## Browser Support
 
-```bash
-npm run play
-```
+Works in all modern browsers that support:
+- `matchMedia` API for system theme detection
+- `Storage` API (localStorage/sessionStorage)
+- CSS custom properties (CSS variables)
 
-- Run the unit tests:
+## Contributing
 
-```bash
-npm run test
-```
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-- Build the library:
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-```bash
-npm run build
-```
+## License
+
+MIT License - see [LICENSE](LICENSE) file for details
+
+## Acknowledgments
+
+- Inspired by [next-themes](https://github.com/pacocoursey/next-themes)
+- Built for [TanStack Router](https://tanstack.com/router)
+
+## Links
+
+- [GitHub Repository](https://github.com/lukonik/tanstack-themer)
+- [NPM Package](https://www.npmjs.com/package/tanstack-themer)
+- [Report Issues](https://github.com/lukonik/tanstack-themer/issues)
