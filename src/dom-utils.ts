@@ -25,10 +25,15 @@ export const disableAnimation = (nonce?: string) => {
 };
 
 export const getSystemTheme = (e?: MediaQueryList | MediaQueryListEvent) => {
-  if (!e) e = window.matchMedia(MEDIA);
-  const isDark = e.matches;
-  const systemTheme = isDark ? "dark" : "light";
-  return systemTheme;
+  return ssrSafeAction(
+    () => {
+      if (!e) e = window.matchMedia(MEDIA);
+      const isDark = e.matches;
+      const systemTheme = isDark ? "dark" : "light";
+      return systemTheme;
+    },
+    () => "light",
+  );
 };
 
 export const handleAttribute = (
@@ -47,4 +52,11 @@ export const handleAttribute = (
       el.removeAttribute(attr);
     }
   }
+};
+
+export const ssrSafeAction = <T>(action: () => T, fallback?: () => T) => {
+  if (isServer) {
+    return fallback?.();
+  }
+  return action();
 };
