@@ -13,6 +13,14 @@ interface ScriptProps extends React.DetailedHTMLProps<
   [dataAttribute: DataAttribute]: any;
 }
 
+export interface ThemeStorage {
+  getItem(key: string): string | null;
+  setItem(key: string, value: string): void;
+  removeItem?(key: string): void;
+}
+
+export type BuiltInStorage = "localStorage" | "sessionStorage" | "cookie";
+
 export interface UseThemeProps {
   /** List of all available theme names */
   themes: string[];
@@ -41,7 +49,7 @@ export interface ThemeProviderProps extends React.PropsWithChildren<unknown> {
   disableTransitionOnChange?: boolean | undefined;
   /** Whether to indicate to browsers which color scheme is used (dark or light) for built-in UI like inputs and buttons */
   enableColorScheme?: boolean | undefined;
-  /** Key used to store theme setting in localStorage */
+  /** Key used to store theme setting in storage */
   storageKey?: string | undefined;
   /** Default theme name (for v0.0.12 and lower the default was light). If `enableSystem` is false, the default theme is light */
   defaultTheme?: string | undefined;
@@ -53,6 +61,8 @@ export interface ThemeProviderProps extends React.PropsWithChildren<unknown> {
   nonce?: string | undefined;
   /** Props to pass the inline script */
   scriptProps?: ScriptProps | undefined;
+  /** Storage to use for persisting theme. Can be "localStorage", "sessionStorage", "cookie", or a custom ThemeStorage object. Defaults to "localStorage" */
+  storage?: BuiltInStorage | ThemeStorage | undefined;
 }
 
 export type ThemeScript = (

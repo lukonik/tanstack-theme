@@ -1,8 +1,12 @@
 "use client";
 
 import * as React from "react";
-import { localStorageScript } from "tanstack-theme";
 import { ScriptOnce } from "./ScriptOnce";
+import {
+  getStorageAdapter,
+  getStorageScript,
+  isBuiltInStorage,
+} from "./storage/storage";
 import type { Attribute, ThemeProviderProps, UseThemeProps } from "./types";
 
 const colorSchemes = ["light", "dark"];
@@ -10,15 +14,6 @@ const MEDIA = "(prefers-color-scheme: dark)";
 const isServer = typeof window === "undefined";
 const ThemeContext = React.createContext<UseThemeProps | undefined>(undefined);
 const defaultContext: UseThemeProps = { setTheme: (_) => {}, themes: [] };
-
-const saveToLS = (storageKey: string, value: string) => {
-  // Save to storage
-  try {
-    localStorage.setItem(storageKey, value);
-  } catch (e) {
-    // Unsupported
-  }
-};
 
 export const useTheme = () => React.useContext(ThemeContext) ?? defaultContext;
 
@@ -45,10 +40,17 @@ const Theme = ({
   children,
   nonce,
   scriptProps,
+  storage = "localStorage",
 }: ThemeProviderProps) => {
-  const [theme, setThemeState] = React.useState(() =>
-    getTheme(storageKey, defaultTheme),
+  const storageAdapter = React.useMemo(
+    () => getStorageAdapter(storage),
+    [storage],
   );
+
+  const [theme, setThemeState] = React.useState(() => {
+    if (isServer) return defaultTheme;
+    return storageAdapter.getItem(storageKey) || defaultTheme;
+  });
   const [resolvedTheme, setResolvedTheme] = React.useState(() =>
     theme === "system" ? getSystemTheme() : theme,
   );
@@ -100,20 +102,21 @@ const Theme = ({
     [nonce],
   );
 
-  const setTheme = React.useCallback((value: any) => {
-    if (typeof value === "function") {
-      setThemeState((prevTheme) => {
-        const newTheme = value(prevTheme);
-
-        saveToLS(storageKey, newTheme);
-
-        return newTheme;
-      });
-    } else {
-      setThemeState(value);
-      saveToLS(storageKey, value);
-    }
-  }, []);
+  const setTheme = React.useCallback(
+    (value: any) => {
+      if (typeof value === "function") {
+        setThemeState((prevTheme) => {
+          const newTheme = value(prevTheme);
+          storageAdapter.setItem(storageKey, newTheme);
+          return newTheme;
+        });
+      } else {
+        setThemeState(value);
+        storageAdapter.setItem(storageKey, value);
+      }
+    },
+    [storageAdapter, storageKey],
+  );
 
   const handleMediaQuery = React.useCallback(
     (e: MediaQueryListEvent | MediaQueryList) => {
@@ -138,14 +141,18 @@ const Theme = ({
     return () => media.removeListener(handleMediaQuery);
   }, [handleMediaQuery]);
 
-  // localStorage event handling
+  // Storage event handling (only for localStorage and sessionStorage)
   React.useEffect(() => {
+    if (!isBuiltInStorage(storage) || storage === "cookie") {
+      return;
+    }
+
     const handleStorage = (e: StorageEvent) => {
       if (e.key !== storageKey) {
         return;
       }
 
-      // If default theme set, use it if localstorage === null (happens on local storage manual deletion)
+      // If default theme set, use it if storage === null (happens on storage manual deletion)
       if (!e.newValue) {
         setTheme(defaultTheme);
       } else {
@@ -155,7 +162,7 @@ const Theme = ({
 
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
-  }, [setTheme]);
+  }, [setTheme, storage, storageKey, defaultTheme]);
 
   // Whenever theme or forcedTheme changes, apply it
   React.useEffect(() => {
@@ -191,6 +198,7 @@ const Theme = ({
           themes,
           nonce,
           scriptProps,
+          storage,
         }}
       />
 
@@ -210,7 +218,11 @@ export const ThemeScript = React.memo(
     value,
     themes,
     scriptProps,
-  }: Omit<ThemeProviderProps, "children"> & { defaultTheme: string }) => {
+    storage = "localStorage",
+  }: Omit<ThemeProviderProps, "children"> & {
+    defaultTheme: string;
+  }) => {
+    const script = getStorageScript(storage);
     const scriptArgs = JSON.stringify([
       attribute,
       storageKey,
@@ -224,24 +236,13 @@ export const ThemeScript = React.memo(
     return (
       <ScriptOnce
         attributes={scriptProps}
-        children={`(${localStorageScript.toString()})(${scriptArgs})`}
+        children={`(${script.toString()})(${scriptArgs})`}
       />
     );
   },
 );
 
 // Helpers
-const getTheme = (key: string, fallback?: string) => {
-  if (isServer) return undefined;
-  let theme;
-  try {
-    theme = localStorage.getItem(key) || undefined;
-  } catch (e) {
-    // Unsupported
-  }
-  return theme || fallback;
-};
-
 const disableAnimation = (nonce?: string) => {
   const css = document.createElement("style");
   if (nonce) css.setAttribute("nonce", nonce);
@@ -271,4 +272,11 @@ const getSystemTheme = (e?: MediaQueryList | MediaQueryListEvent) => {
 };
 
 // Re-export types
-export type { Attribute, ThemeProviderProps, UseThemeProps } from "./types";
+export type {
+  Attribute,
+  BuiltInStorage,
+  ThemeProviderProps,
+  ThemeStorage,
+  UseThemeProps
+} from "./types";
+
