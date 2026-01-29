@@ -1,5 +1,11 @@
 # tan-themer
 
+## 0.4.0
+
+### Minor Changes
+
+- b124eb6: rename to tan-themer
+
 ## 0.3.0
 
 ### Minor Changes
