@@ -1,17 +1,17 @@
 {
-  "name": "tanstack-themer",
+  "name": "tan-themer",
   "type": "module",
   "version": "0.3.0",
   "description": "A starter for creating a React component library.",
   "author": "Author Name <author.name@mail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/lukonik/tanstack-themer",
+  "homepage": "https://github.com/lukonik/tan-themer",
   "repository": {
     "type": "git",
-    "url": "https://github.com/lukonik/tanstack-themer"
+    "url": "https://github.com/lukonik/tan-themer"
   },
   "bugs": {
-    "url": "https://github.com/lukonik/tanstack-themer/issues"
+    "url": "https://github.com/lukonik/tan-themer/issues"
   },
   "exports": {
     ".": "./dist/index.js",

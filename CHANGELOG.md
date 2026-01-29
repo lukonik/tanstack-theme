@@ -1,4 +1,4 @@
-# tanstack-themer
+# tan-themer
 
 ## 0.3.0
 

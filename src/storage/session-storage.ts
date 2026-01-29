@@ -1,6 +1,6 @@
 import type { ThemeStorage } from "../types";
 
-const CHANNEL_PREFIX = "tanstack-themer:";
+const CHANNEL_PREFIX = "tan-themer:";
 
 export const sessionStorageAdapter: ThemeStorage = {
   getItem: (key) => {
