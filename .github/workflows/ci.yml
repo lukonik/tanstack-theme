@@ -24,9 +24,9 @@ jobs:
         run: bunx playwright install --with-deps chromium
 
       - name: Run CI Checks
-        run: |
+        run: |  
+          bun run build
           bun run typecheck
           bun run test --run
-          bun run build
         env:
           CI: true
