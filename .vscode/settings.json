@@ -7,7 +7,8 @@
     "**/Thumbs.db": true,
     "node_modules": true,
     "**/routeTree.gen.ts": true,
-    "dist": true
+    "dist": true,
+    "**/__screenshots__": true
   },
   "files.readonlyInclude": {
     "**/routeTree.gen.ts": true
