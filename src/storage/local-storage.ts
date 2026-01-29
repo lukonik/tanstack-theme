@@ -22,4 +22,13 @@ export const localStorageAdapter: ThemeStorage = {
       // Unsupported
     }
   },
+  subscribe: (key, callback) => {
+    const handler = (e: StorageEvent) => {
+      if (e.key === key) {
+        callback(e.newValue);
+      }
+    };
+    window.addEventListener("storage", handler);
+    return () => window.removeEventListener("storage", handler);
+  },
 };

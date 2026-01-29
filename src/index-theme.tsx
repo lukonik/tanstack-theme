@@ -16,10 +16,7 @@ import {
   MEDIA
 } from "./dom-utils";
 import { ThemeScript } from "./script/theme-script";
-import {
-  getStorageAdapter,
-  isBuiltInStorage
-} from "./storage/storage";
+import { getStorageAdapter } from "./storage/storage";
 import type { ThemeProviderProps, UseThemeProps } from "./types";
 
 const colorSchemes = ["light", "dark"];
@@ -138,28 +135,19 @@ const Theme = ({
     return () => media.removeEventListener("change", handleMediaQuery);
   }, [handleMediaQuery]);
 
-  // Storage event handling (only for localStorage and sessionStorage)
+  // Cross-tab sync via storage adapter's subscribe method
   useEffect(() => {
-    if (!isBuiltInStorage(storage) || storage === "cookie") {
-      return;
-    }
+    if (!storageAdapter.subscribe) return;
 
-    const handleStorage = (e: StorageEvent) => {
-      if (e.key !== storageKey) {
-        return;
-      }
-
+    return storageAdapter.subscribe(storageKey, (newValue) => {
       // If default theme set, use it if storage === null (happens on storage manual deletion)
-      if (!e.newValue) {
+      if (!newValue) {
         setTheme(defaultTheme);
       } else {
-        setThemeState(e.newValue); // Direct state update to avoid loops
+        setThemeState(newValue); // Direct state update to avoid loops
       }
-    };
-
-    window.addEventListener("storage", handleStorage);
-    return () => window.removeEventListener("storage", handleStorage);
-  }, [setTheme, storage, storageKey, defaultTheme]);
+    });
+  }, [storageAdapter, storageKey, defaultTheme, setTheme]);
 
   // Whenever theme or forcedTheme changes, apply it
   useEffect(() => {

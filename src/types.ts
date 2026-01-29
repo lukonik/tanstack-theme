@@ -17,6 +17,8 @@ export interface ThemeStorage {
   getItem(key: string): string | null;
   setItem(key: string, value: string): void;
   removeItem?(key: string): void;
+  /** Subscribe to storage changes from other tabs. Returns cleanup function. */
+  subscribe?(key: string, callback: (newValue: string | null) => void): () => void;
 }
 
 export type BuiltInStorage = "localStorage" | "sessionStorage" | "cookie";
