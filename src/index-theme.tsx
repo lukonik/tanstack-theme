@@ -2,18 +2,16 @@
 
 import {
   createContext,
-  memo,
   useCallback,
   useContext,
   useEffect,
   useMemo,
-  useState,
+  useState
 } from "react";
-import { ScriptOnce } from "./ScriptOnce";
+import { ThemeScript } from "./script/theme-script";
 import {
   getStorageAdapter,
-  getStorageScript,
-  isBuiltInStorage,
+  isBuiltInStorage
 } from "./storage/storage";
 import type { Attribute, ThemeProviderProps, UseThemeProps } from "./types";
 
@@ -210,41 +208,6 @@ const Theme = ({
     </ThemeContext.Provider>
   );
 };
-
-export const ThemeScript = memo(
-  ({
-    forcedTheme,
-    storageKey,
-    attribute,
-    enableSystem,
-    enableColorScheme,
-    defaultTheme,
-    value,
-    themes,
-    scriptProps,
-    storage = "localStorage",
-  }: Omit<ThemeProviderProps, "children"> & {
-    defaultTheme: string;
-  }) => {
-    const script = getStorageScript(storage);
-    const scriptArgs = JSON.stringify([
-      attribute,
-      storageKey,
-      defaultTheme,
-      forcedTheme,
-      themes,
-      value,
-      enableSystem,
-      enableColorScheme,
-    ]).slice(1, -1);
-    return (
-      <ScriptOnce
-        attributes={scriptProps}
-        children={`(${script.toString()})(${scriptArgs})`}
-      />
-    );
-  },
-);
 
 // Helpers
 const disableAnimation = (nonce?: string) => {
