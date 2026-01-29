@@ -8,16 +8,21 @@ import {
   useMemo,
   useState
 } from "react";
+import {
+  disableAnimation,
+  getSystemTheme,
+  handleAttribute,
+  isServer,
+  MEDIA
+} from "./dom-utils";
 import { ThemeScript } from "./script/theme-script";
 import {
   getStorageAdapter,
   isBuiltInStorage
 } from "./storage/storage";
-import type { Attribute, ThemeProviderProps, UseThemeProps } from "./types";
+import type { ThemeProviderProps, UseThemeProps } from "./types";
 
 const colorSchemes = ["light", "dark"];
-const MEDIA = "(prefers-color-scheme: dark)";
-const isServer = typeof window === "undefined";
 const ThemeContext = createContext<UseThemeProps | undefined>(undefined);
 const defaultContext: UseThemeProps = { setTheme: (_) => {}, themes: [] };
 
@@ -73,21 +78,11 @@ const Theme = ({
       const enable = disableTransitionOnChange ? disableAnimation(nonce) : null;
       const d = document.documentElement;
 
-      const handleAttribute = (attr: Attribute) => {
-        if (attr === "class") {
-          d.classList.remove(...attrs);
-          if (name) d.classList.add(name);
-        } else if (attr.startsWith("data-")) {
-          if (name) {
-            d.setAttribute(attr, name);
-          } else {
-            d.removeAttribute(attr);
-          }
-        }
-      };
-
-      if (Array.isArray(attribute)) attribute.forEach(handleAttribute);
-      else handleAttribute(attribute);
+      if (Array.isArray(attribute)) {
+        attribute.forEach((attr) => handleAttribute(attr, d, attrs, name));
+      } else {
+        handleAttribute(attribute, d, attrs, name);
+      }
 
       if (enableColorScheme) {
         const fallback = colorSchemes.includes(defaultTheme)
@@ -207,35 +202,6 @@ const Theme = ({
       {children}
     </ThemeContext.Provider>
   );
-};
-
-// Helpers
-const disableAnimation = (nonce?: string) => {
-  const css = document.createElement("style");
-  if (nonce) css.setAttribute("nonce", nonce);
-  css.appendChild(
-    document.createTextNode(
-      `*,*::before,*::after{-webkit-transition:none!important;-moz-transition:none!important;-o-transition:none!important;-ms-transition:none!important;transition:none!important}`,
-    ),
-  );
-  document.head.appendChild(css);
-
-  return () => {
-    // Force restyle
-    (() => window.getComputedStyle(document.body))();
-
-    // Wait for next tick before removing
-    setTimeout(() => {
-      document.head.removeChild(css);
-    }, 1);
-  };
-};
-
-const getSystemTheme = (e?: MediaQueryList | MediaQueryListEvent) => {
-  if (!e) e = window.matchMedia(MEDIA);
-  const isDark = e.matches;
-  const systemTheme = isDark ? "dark" : "light";
-  return systemTheme;
 };
 
 // Re-export types
