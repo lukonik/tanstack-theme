@@ -1,4 +1,4 @@
-# react-components-starter
+# tanstack-theme
 
 A starter for creating a React component library.
 
