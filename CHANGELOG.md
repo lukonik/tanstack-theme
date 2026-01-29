@@ -1,5 +1,11 @@
 # tanstack-themer
 
+## 0.3.0
+
+### Minor Changes
+
+- 3201874: remove nonce option
+
 ## 0.2.1
 
 ### Patch Changes
