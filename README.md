@@ -1,6 +1,6 @@
 <div align="center">
-  <h1>TanStack Themer</h1>
-  <p>ATan Themerfriendly theme management library for React applications built with TanStack Router and TanStack Start</p>
+  <h1>Tan Themer</h1>
+  <p>tan-themer is a theme management library for React applications built for TanStack Router and TanStack Start</p>
 </div>
 
 <div align="center">
