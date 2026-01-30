@@ -1,5 +1,11 @@
 # tan-themer
 
+## 0.4.1
+
+### Patch Changes
+
+- 09c81f6: add keywords to package.json
+
 ## 0.4.0
 
 ### Minor Changes
