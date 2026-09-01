@@ -14,7 +14,7 @@ const siteUrl = "https://lukonik.github.io/themer";
 const siteTitle = "Themer";
 const siteDescription =
   "Theme management for TanStack Router and TanStack Start with SSR support, zero FOUC, system theme detection, and flexible storage adapters.";
-const siteImage = `${siteUrl}/logo.png`;
+const siteImage = `${siteUrl}/social-card.png`;
 
 const options: PrestigeShellProps = {
   customHeaderTitle: () => (
@@ -53,11 +53,23 @@ export const Route = createRootRoute({
       { property: "og:title", content: siteTitle },
       { property: "og:description", content: siteDescription },
       { property: "og:image", content: siteImage },
-      { property: "og:image:alt", content: "Themer logo" },
+      { property: "og:image:type", content: "image/png" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      {
+        property: "og:image:alt",
+        content: "Themer — theme management for TanStack Router and Start",
+      },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:site", content: "@lonikdev" },
+      { name: "twitter:creator", content: "@lonikdev" },
       { name: "twitter:title", content: siteTitle },
       { name: "twitter:description", content: siteDescription },
       { name: "twitter:image", content: siteImage },
+      {
+        name: "twitter:image:alt",
+        content: "Themer — theme management for TanStack Router and Start",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

@@ -23,7 +23,7 @@ export const Route = createFileRoute("/")({
     const title = "Themer | Theme management for TanStack Router";
     const description =
       "Add light, dark, system, and custom themes to TanStack Router and TanStack Start apps with SSR support and zero flash of unstyled content.";
-    const image = "https://lukonik.github.io/themer/logo.png";
+    const image = "https://lukonik.github.io/themer/social-card.png";
     const url = "https://lukonik.github.io/themer/";
 
     return {
@@ -34,10 +34,20 @@ export const Route = createFileRoute("/")({
         { property: "og:description", content: description },
         { property: "og:url", content: url },
         { property: "og:image", content: image },
-        { property: "og:image:alt", content: "Themer logo" },
+        { property: "og:image:type", content: "image/png" },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
+        {
+          property: "og:image:alt",
+          content: "Themer — theme management for TanStack Router and Start",
+        },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: description },
         { name: "twitter:image", content: image },
+        {
+          name: "twitter:image:alt",
+          content: "Themer — theme management for TanStack Router and Start",
+        },
       ],
       links: [{ rel: "canonical", href: url }],
     };

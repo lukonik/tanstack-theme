@@ -75,6 +75,9 @@ importers:
       jsdom:
         specifier: ^28.1.0
         version: 28.1.0
+      sharp:
+        specifier: 0.34.5
+        version: 0.34.5
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
